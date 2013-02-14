@@ -88,14 +88,14 @@ uppercase no
 TEXT
 $nodename - $kernel on $machine
 ${color #808080}$hr$color
-Uptime:$color $uptime - Load: $loadavg
+Uptime:$color $uptime
+CPU Load: $loadavg
 CPU Usage: ${cpu}% ${cpubar}
 ${cpugraph}
 RAM Usage: $mem/$memmax - $memperc%
 $membar
 ${memgraph}
 Swap Usage: $swap/$swapmax - $swapperc%
-${swapbar}
 Battery Charge: ${battery_percent}% ${battery_bar}
 ${color #808080}$hr$color
 Wireless Networking Stats:
