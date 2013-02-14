@@ -88,8 +88,6 @@ uppercase no
 TEXT
 $nodename - $kernel on $machine
 ${color #808080}$hr$color
-${execpi 10 python ~/.conky/scripts/ubuntu_package_monitoring.py}
-${color #808080}$hr$color
 Uptime:$color $uptime
 CPU Load: $loadavg
 CPU Usage: ${cpu}% ${cpubar}
