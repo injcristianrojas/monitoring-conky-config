@@ -88,6 +88,9 @@ uppercase no
 TEXT
 $nodename - $kernel on $machine
 ${color #808080}$hr$color
+Regular package updates: ${execi 60 /usr/lib/update-notifier/apt-check 2>&1 | cut -d ';' -f 2}
+Security package updates: ${execi 60 /usr/lib/update-notifier/apt-check 2>&1 | cut -d ';' -f 1}
+${color #808080}$hr$color
 Uptime:$color $uptime
 CPU Load: $loadavg
 CPU Usage: ${cpu}% ${cpubar}
