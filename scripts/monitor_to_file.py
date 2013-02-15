@@ -17,7 +17,9 @@
    limitations under the License.
 """
 
-from monitor import get_monitoring_data, service_definitions
+from monitor import get_monitoring_data, JSON_DATA_FILE
+from service_defs import service_definitions
+import json
 
 """
 This module is for cron jobs. It stores data in a data.txt file for retrieval
@@ -30,12 +32,18 @@ cron jobs. Recommended configuration is to execute every 5 minutes, like
 this:
 
     */5 * * * * python ~/.conky/scripts/monitor_to_file.py
-    
+
 """
 
 if __name__ == '__main__':
-    f = open('data.txt', 'w')
+    f = open(JSON_DATA_FILE, 'w')
+    data_dict = {}
     for service_definition, data in sorted(service_definitions.items()):
         print('Getting status for %s' % data.get('name'))
-        f.write(get_monitoring_data(service_definition) + '\n')
+        data_dict[service_definition] = {}
+        monitoring_data = get_monitoring_data(service_definition, formatted = False)
+        data_dict[service_definition]['service_name'] = monitoring_data[0]
+        data_dict[service_definition]['status_string'] = monitoring_data[1]
+        #f.write(get_monitoring_data(service_definition) + '\n')
+    f.write(json.dumps(data_dict))
     f.close()
