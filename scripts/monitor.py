@@ -48,16 +48,24 @@ def get_up_down_status(service, exit_code):
         message = 'UP'
     return '%s ${alignr} ${color %s}%s${color}' % (service, color, message)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Sends SSH commands over multiple tunnels')
-    parser.add_argument('service', type = str, help = 'service source')
-    args = parser.parse_args()
-    if args.service in service_definitions:
-        service_definition = service_definitions[args.service]
+def get_monitoring_data(service_definition):
+    if service_definition in service_definitions:
+        service_definition = service_definitions[service_definition]
         exit_code = subprocess.call(service_definition['command'], shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         if service_definition['type'] == TYPE_NAGIOS:
-            print get_nagios_status(service_definition['name'], exit_code)
+            return get_nagios_status(service_definition['name'], exit_code)
         else:
-            print get_up_down_status(service_definition['name'], exit_code)
+            return get_up_down_status(service_definition['name'], exit_code)
     else:
-        print "${color red}Service with key %s NOT FOUND${color}" % args.service
+        return "${color red}Service with key %s NOT FOUND${color}" % service_definition
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description = 'Sends SSH commands over multiple tunnels')
+    parser.add_argument('-s', '--service', type = str, help = 'service source')
+    parser.add_argument('-a', '--all', action='store_true', help = 'show all services')
+    args = parser.parse_args()
+    if args.all:
+        for service_definition, data in sorted(service_definitions.items()):
+            print get_monitoring_data(service_definition)
+    else:
+        print get_monitoring_data(args.service)

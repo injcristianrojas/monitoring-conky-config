@@ -103,6 +103,4 @@ Down:${downspeed eth1}  ${alignr} Up: ${upspeed eth1}
 ${downspeedgraph eth1 32,100} $alignr${upspeedgraph eth1 32,100}
 ${color #808080}$hr$color
 Service Monitoring:
-${execpi 10 python ~/.conky/scripts/monitor.py mon1}
-${execpi 10 python ~/.conky/scripts/monitor.py mon2}
-${execpi 10 python ~/.conky/scripts/monitor.py mon3}
+${execpi 60 python ~/.conky/scripts/monitor.py --all}
