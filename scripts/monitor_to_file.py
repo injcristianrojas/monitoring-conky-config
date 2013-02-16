@@ -21,14 +21,15 @@
 This module is for cron jobs. It stores data in a data.txt file for retrieval
 from conky using:
 
-    ${execpi 5 cat ~/.conky/scripts/data.txt}
+    ${execp python ~/.conky/scripts/monitor.py mon1 -j}
 
-To activate a cron job for this, issue the command crontab -e and edit your
-cron jobs. Recommended configuration is to execute every 5 minutes, like
-this:
+There's no need for cron jobs, since they can't check specific services (ssh
+key-based services for instance), so the following is added to the conkyrc:
 
-    */5 * * * * python ~/.conky/scripts/monitor_to_file.py
+    ${texeci 60 python ~/.conky/scripts/monitor_to_file.py}
 
+This executes the script in another thread, so conky doesn't get blocked while
+retrieving service statuses.
 """
 
 import os
