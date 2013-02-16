@@ -102,10 +102,10 @@ Wireless Networking Stats:
 Down:${downspeed eth1}  ${alignr} Up: ${upspeed eth1}
 ${downspeedgraph eth1 32,100} $alignr${upspeedgraph eth1 32,100}
 ${color #808080}$hr$color
-Service Monitoring:
-${execpi 30 python ~/.conky/scripts/monitor.py mon1 -j}
-${execpi 30 python ~/.conky/scripts/monitor.py mon2 -j}
-${execpi 10 python ~/.conky/scripts/monitor.py mon3 -j}
-${execpi 10 python ~/.conky/scripts/monitor.py mon4 -j}
-${execpi 10 python ~/.conky/scripts/monitor.py mon5 -j}
-${execpi 10 python ~/.conky/scripts/monitor.py mon6 -j}
+Service Monitoring: ${texeci 60 python ~/.conky/scripts/monitor_to_file.py}
+${execp python ~/.conky/scripts/monitor.py mon1 -j}
+${execp python ~/.conky/scripts/monitor.py mon2 -j}
+${execp python ~/.conky/scripts/monitor.py mon3 -j}
+${execp python ~/.conky/scripts/monitor.py mon4 -j}
+${execp python ~/.conky/scripts/monitor.py mon5 -j}
+${execp python ~/.conky/scripts/monitor.py mon6 -j}

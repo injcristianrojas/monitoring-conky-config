@@ -46,7 +46,8 @@ definition must be created as follows:
     'MON_ID': {
     	'command': 'COMMAND_TO_BE_EXECUTED',
     	'name': 'NAME_TO_APPEAR',
-    	'type': 'CHECK_TYPE'
+    	'type': 'CHECK_TYPE',
+        'interval': INTERVAL
     }
 
 The parameters are the following:
@@ -62,6 +63,7 @@ information depending on one of the following types:
   * `TYPE_NAGIOS`: This type of display is based on the Nagios style of status
   definitions. It displays `OK` if the command has an exit code of 0, `WARNING`
   if it is 1, and `CRITICAL` if it is 2.
+* `INTERVAL`: Interval to check data in seconds
 
 
 ## Caveats

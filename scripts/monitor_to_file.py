@@ -17,10 +17,6 @@
    limitations under the License.
 """
 
-from monitor import get_monitoring_data, JSON_DATA_FILE
-from service_defs import service_definitions
-import json
-
 """
 This module is for cron jobs. It stores data in a data.txt file for retrieval
 from conky using:
@@ -35,15 +31,42 @@ this:
 
 """
 
-if __name__ == '__main__':
-    f = open(JSON_DATA_FILE, 'w')
-    data_dict = {}
-    for service_definition, data in sorted(service_definitions.items()):
-        print('Getting status for %s' % data.get('name'))
-        data_dict[service_definition] = {}
+import os
+import json
+import time
+import stat
+import datetime
+import argparse
+from monitor import get_monitoring_data, JSON_DATA_DIR
+from service_defs import service_definitions
+
+def create_json_file(service_definition, data, verbose = False):
+    json_data_file = os.path.join(JSON_DATA_DIR, service_definition + '.json')
+    interval = data.get('interval')
+    if file_age_in_seconds > interval:
+        data_dict = {}
         monitoring_data = get_monitoring_data(service_definition, formatted = False)
-        data_dict[service_definition]['service_name'] = monitoring_data[0]
-        data_dict[service_definition]['status_string'] = monitoring_data[1]
-        #f.write(get_monitoring_data(service_definition) + '\n')
-    f.write(json.dumps(data_dict))
-    f.close()
+        data_dict['service_name'] = monitoring_data[0]
+        data_dict['status_color'] = monitoring_data[1]
+        data_dict['status_message'] = monitoring_data[2]
+        f = open(json_data_file, 'w')
+        f.write(json.dumps(data_dict))
+        f.close()
+        if verbose:
+            print('%s: Getting status for %s... %s' % 
+                (
+                    datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
+                    data.get('name'), 
+                    monitoring_data[2]
+                )
+            )
+
+def file_age_in_seconds(pathname):
+    return time.time() - os.stat(pathname)[stat.ST_MTIME]
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description = 'Retrieves data for json conky post-processing')
+    parser.add_argument('-v', '--verbose', action='store_true', help = 'Toggles verbose')
+    args = parser.parse_args()
+    for service_definition, data in sorted(service_definitions.items()):
+        create_json_file(service_definition, data, args.verbose)

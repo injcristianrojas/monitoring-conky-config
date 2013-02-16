@@ -25,16 +25,19 @@ service_definitions = {
     'mon1': {
         'command': 'ls -la',
         'name': 'Check ls',
-        'type': TYPE_UP_DOWN
+        'type': TYPE_UP_DOWN,
+        'interval': 120
     },
     'mon2': {
         'command': 'python -c "import sys;from random import randint;sys.exit(randint(0,2))"',
         'name': 'Random Nagios exit code',
-        'type': TYPE_NAGIOS
+        'type': TYPE_NAGIOS,
+        'interval': 120
     },
     'mon3': {
         'command': 'python -c "import sys;from random import randint;sys.exit(randint(0,2))"',
         'name': 'Random UP/DOWN exit code',
-        'type': TYPE_UP_DOWN
+        'type': TYPE_UP_DOWN,
+        'interval': 120
     },
 }

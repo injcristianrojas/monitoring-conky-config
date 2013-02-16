@@ -24,7 +24,7 @@ import argparse
 import json
 from service_defs import service_definitions, TYPE_NAGIOS, TYPE_UP_DOWN
 
-JSON_DATA_FILE = os.path.join(os.path.expanduser('~'), '.conky/scripts/data.json')
+JSON_DATA_DIR = os.path.join(os.path.expanduser('~'), '.conky/scripts/bucket')
 
 def get_nagios_status(service, exit_code):
     statuses = {
@@ -41,46 +41,50 @@ def get_nagios_status(service, exit_code):
             'message': 'CRITICAL'
         },
     }
-    return (service, '${alignr} ${color %s}%s${color}' % (statuses[exit_code]['color'], statuses[exit_code]['message']))
+    return (
+        service,
+        statuses.get(exit_code, {}).get('color', 'orange'),
+        statuses.get(exit_code, {}).get('message', 'UNKNOWN')
+    )
 
 def get_up_down_status(service, exit_code):
     color = 'red'
     message = 'DOWN'
-    if exit_code is 0:
+    if exit_code == 0:
         color = 'green'
         message = 'UP'
-    return (service, '${alignr} ${color %s}%s${color}' % (color, message))
+    return (service, color, message)
 
 def format_data(service_data):
-    return '%s %s' % service_data
+    return '%s ${alignr} ${color %s}%s${color}' % service_data
 
 def get_monitoring_data(service_definition, formatted = True):
     if service_definition in service_definitions:
-        service_definition = service_definitions[service_definition]
-        exit_code = subprocess.call(service_definition['command'], shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        if service_definition['type'] == TYPE_NAGIOS:
-            data = get_nagios_status(service_definition['name'], exit_code)
+        service_definition = service_definitions.get(service_definition)
+        exit_code = subprocess.call(service_definition.get('command'), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        if service_definition.get('type') == TYPE_NAGIOS:
+            data = get_nagios_status(service_definition.get('name'), exit_code)
         else:
-            data = get_up_down_status(service_definition['name'], exit_code)
+            data = get_up_down_status(service_definition.get('name'), exit_code)
     else:
-        data = (service_definition, '${color purple}NOT FOUND${color}')
+        data = (service_definition, 'orange', 'NOT FOUND')
     return format_data(data) if formatted else data
 
 def get_json_data(service_definition):
-    json_fd = open(JSON_DATA_FILE, 'r')
+    json_data_file = os.path.join(JSON_DATA_DIR, service_definition + '.json')
+    json_fd = open(json_data_file, 'r')
     try:
         json_data = json.loads(json_fd.readline())
     except ValueError:
         return '%s${alignr} ${color grey}RETRIEVING${color}' % service_definitions.get(service_definition).get('name')
     finally:
         json_fd.close()
-    definition_data = json_data.get(service_definition)
-    return '%s%s' % (definition_data.get('service_name'), definition_data.get('status_string'))
+    return '%s ${alignr} ${color %s}%s${color}' % (json_data.get('service_name'), json_data.get('status_color'), json_data.get('status_message'))
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Sends SSH commands over multiple tunnels')
+    parser = argparse.ArgumentParser(description = 'Retrieves data for conky processing')
     parser.add_argument('service', type = str, help = 'service source')
-    parser.add_argument('-j', '--json', action='store_true', help = 'Retrieves it from cron-scheduled json file (faster)')
+    parser.add_argument('-j', '--json', action='store_true', help = 'Retrieves it from scheduled json file (faster)')
     args = parser.parse_args()
     print get_json_data(args.service) if args.json else get_monitoring_data(args.service)
