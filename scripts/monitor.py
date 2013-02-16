@@ -61,11 +61,16 @@ def format_data(service_data):
 def get_monitoring_data(service_definition, formatted = True):
     if service_definition in service_definitions:
         service_definition = service_definitions.get(service_definition)
-        exit_code = subprocess.call(service_definition.get('command'), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        exit_code = subprocess.call(service_definition.get('command'),
+                                    shell = True,
+                                    stdout = subprocess.PIPE,
+                                    stderr = subprocess.PIPE)
         if service_definition.get('type') == TYPE_NAGIOS:
-            data = get_nagios_status(service_definition.get('name'), exit_code)
+            data = get_nagios_status(service_definition.get('name'),
+                                     exit_code)
         else:
-            data = get_up_down_status(service_definition.get('name'), exit_code)
+            data = get_up_down_status(service_definition.get('name'),
+                                      exit_code)
     else:
         data = (service_definition, 'orange', 'NOT FOUND')
     return format_data(data) if formatted else data
@@ -76,15 +81,27 @@ def get_json_data(service_definition):
     try:
         json_data = json.loads(json_fd.readline())
     except ValueError:
-        return '%s${alignr} ${color grey}RETRIEVING${color}' % service_definitions.get(service_definition).get('name')
+        return ('%s${alignr} ${color grey}RETRIEVING${color}'
+                % service_definitions.get(service_definition).get('name')
+        )
     finally:
         json_fd.close()
-    return '%s ${alignr} ${color %s}%s${color}' % (json_data.get('service_name'), json_data.get('status_color'), json_data.get('status_message'))
+    return ('%s ${alignr} ${color %s}%s${color}'
+             % (json_data.get('service_name'),
+                json_data.get('status_color'),
+                json_data.get('status_message')))
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Retrieves data for conky processing')
+    parser = argparse.ArgumentParser(
+                        description = 'Retrieves data for conky processing'
+    )
     parser.add_argument('service', type = str, help = 'service source')
-    parser.add_argument('-j', '--json', action='store_true', help = 'Retrieves it from scheduled json file (faster)')
+    parser.add_argument('-j',
+                        '--json',
+                        action='store_true',
+                        help = 'Retrieves data from json file (faster)')
     args = parser.parse_args()
-    print get_json_data(args.service) if args.json else get_monitoring_data(args.service)
+    print (get_json_data(args.service)
+           if args.json
+           else get_monitoring_data(args.service))

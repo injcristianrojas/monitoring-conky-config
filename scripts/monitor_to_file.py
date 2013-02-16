@@ -46,7 +46,8 @@ def create_json_file(service_definition, data, verbose = False):
     interval = data.get('interval')
     if file_age_in_seconds > interval:
         data_dict = {}
-        monitoring_data = get_monitoring_data(service_definition, formatted = False)
+        monitoring_data = get_monitoring_data(service_definition,
+                                              formatted = False)
         data_dict['service_name'] = monitoring_data[0]
         data_dict['status_color'] = monitoring_data[1]
         data_dict['status_message'] = monitoring_data[2]
@@ -66,8 +67,12 @@ def file_age_in_seconds(pathname):
     return time.time() - os.stat(pathname)[stat.ST_MTIME]
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Retrieves data for json conky post-processing')
-    parser.add_argument('-v', '--verbose', action='store_true', help = 'Toggles verbose')
+    parser = argparse.ArgumentParser(
+            description = 'Retrieves data for json conky post-processing')
+    parser.add_argument('-v',
+                        '--verbose',
+                        action='store_true',
+                        help = 'Toggles verbose')
     args = parser.parse_args()
     for service_definition, data in sorted(service_definitions.items()):
         create_json_file(service_definition, data, args.verbose)
